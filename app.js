@@ -10,6 +10,4 @@ app.all('/*', (req,res) => {
     res.status(404).send({ msg: "Wrong URL!" });
 });
 
-app.use(catchAll);
-
 module.exports = app;

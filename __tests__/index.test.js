@@ -14,10 +14,14 @@ describe('api/categories', () => {
             .get('/api/categories')
             .expect(200)
             .then((response) => {
-                expect(response.body.categories).toEqual(expect.any(Array));
-                expect(Object.keys(response.body.categories[0])).toEqual(
-                    expect.arrayContaining(['slug', 'description'])
-                );
+                const categories = response.body.categories;
+                categories.forEach(category => {
+                    expect(category).toMatchObject({
+                        slug: expect.any(String),
+                        description: expect.any(String)
+                    });
+                });
+                expect();
             });
     });
     test('GET:404 responds with a message of "Wrong URL" when provided with wrong end point', () => {
