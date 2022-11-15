@@ -1,7 +1,7 @@
 const { selectCategories } = require('../models/models.js');
 
 exports.getCategories = (req, res, next) => {
-    selectCategories().then(categorie => {
-        res.status(200).send({ categorie });
+    selectCategories().then(categories => {
+        res.status(200).send({ categories });
     }).catch(next);
 };
