@@ -20,4 +20,12 @@ describe.only('api/categories', () => {
                 );
             });
     });
+    test('GET:404 responds with a message of "Wrong URL" when provided with wrong end point', () => {
+        return request(app)
+            .get('/api/badURL')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Wrong URL!');
+            });
+    });
 });
