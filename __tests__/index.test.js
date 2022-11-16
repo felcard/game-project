@@ -25,17 +25,10 @@ describe('api/categories', () => {
                 expect();
             });
     });
-    test('GET:404 responds with a message of "Wrong URL" when provided with wrong end point', () => {
-        return request(app)
-            .get('/api/badURL')
-            .expect(404)
-            .then((response) => {
-                expect(response.body.msg).toBe('Wrong URL!');
-            });
-    });
+
 });
 
-describe.only('/api/reviews', () => {
+describe('/api/reviews', () => {
     test('GET:200 responds with array of reviews with properties: owner(which is the `username` from the users table), title, review_id, category, review_img_url, created_at, votes, designer, comment_count which is the total count of all the comments with this review_id. the reviews should be sorted by date in descending order', () => {
         return request(app)
             .get('/api/reviews')
@@ -59,6 +52,9 @@ describe.only('/api/reviews', () => {
                 });
             });
     });
+});
+
+describe('ERROR HANDLERS', () => {
     test('GET:404 responds with a message of "Wrong URL" when provided with wrong end point', () => {
         return request(app)
             .get('/api/badURL')
