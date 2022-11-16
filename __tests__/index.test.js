@@ -26,6 +26,14 @@ describe('api/categories', () => {
                 expect();
             });
     });
+    test('GET:404 responds with a message of "Wrong URL" when provided with wrong end point', () => {
+        return request(app)
+            .get('/api/badURL')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Wrong URL!');
+            });
+    });
 
 });
 
@@ -53,15 +61,51 @@ describe('/api/reviews', () => {
                 });
             });
     });
-});
-
-describe('ERROR HANDLERS', () => {
     test('GET:404 responds with a message of "Wrong URL" when provided with wrong end point', () => {
         return request(app)
             .get('/api/badURL')
             .expect(404)
             .then((response) => {
                 expect(response.body.msg).toBe('Wrong URL!');
+            });
+    });
+});
+
+describe('/api/reviews/:review_id', () => {
+    test('GET:200 Responds with:a review object, with properties:`review_id` which is the primary key- `title`- `review_body`- `designer`- `review_img_url` - `votes` - `category` field which references the `slug` in the categories table-  `owner` field that references a user"s primary key (`username`)- `created_at`', () => {
+        return request(app)
+            .get('/api/reviews/2')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.review[0]).toEqual(
+                    expect.objectContaining({
+                        title: 'Jenga',
+                        designer: 'Leslie Scott',
+                        owner: 'philippaclaire9',
+                        review_img_url:
+                            'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+                        review_body: 'Fiddly fun for all the family',
+                        category: 'dexterity',
+                        created_at: '2021-01-18T10:01:41.251Z',
+                        votes: 5
+                    })
+                );
+            });
+    });
+    test("400: sends an appropriate error message when passed an invalid id", () => {
+        return request(app)
+            .get("/api/reviews/sluguish")
+            .expect(400)
+            .then((res) => {
+                expect(res.body.msg).toBe("Invalid review identifier");
+            });
+    });
+    test("404: sends an appropriate error message when passed a valid but non-existent id", () => {
+        return request(app)
+            .get("/api/reviews/777")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Review 777 could not be found");
             });
     });
 });
