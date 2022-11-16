@@ -16,6 +16,7 @@ describe('api/categories', () => {
             .expect(200)
             .then((response) => {
                 const categories = response.body.categories;
+                expect(categories.length > 0).toBe(true);
                 categories.forEach(category => {
                     expect(category).toMatchObject({
                         slug: expect.any(String),
