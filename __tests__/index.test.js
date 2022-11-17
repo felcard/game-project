@@ -3,7 +3,6 @@ const request = require('supertest');
 const db = require('../db/connection.js');
 const seed = require('../db/seeds/seed.js');
 const seedingData = require('../db/data/test-data/index.js');
-const { } = require('../db/seeds/utils.js');
 
 beforeEach(() => seed(seedingData));
 afterAll(() => db.end());
@@ -26,15 +25,6 @@ describe('api/categories', () => {
                 expect();
             });
     });
-    test('GET:404 responds with a message of "Wrong URL" when provided with wrong end point', () => {
-        return request(app)
-            .get('/api/badURL')
-            .expect(404)
-            .then((response) => {
-                expect(response.body.msg).toBe('Wrong URL!');
-            });
-    });
-
 });
 
 describe('/api/reviews', () => {
@@ -59,14 +49,6 @@ describe('/api/reviews', () => {
                 expect(reviews).toBeSortedBy('created_at', {
                     descending: true,
                 });
-            });
-    });
-    test('GET:404 responds with a message of "Wrong URL" when provided with wrong end point', () => {
-        return request(app)
-            .get('/api/badURL')
-            .expect(404)
-            .then((response) => {
-                expect(response.body.msg).toBe('Wrong URL!');
             });
     });
 });
@@ -97,7 +79,7 @@ describe('/api/reviews/:review_id', () => {
             .get("/api/reviews/sluguish")
             .expect(400)
             .then((res) => {
-                expect(res.body.msg).toBe("Invalid review identifier");
+                expect(res.body.msg).toBe("Bad Request");
             });
     });
     test("404: sends an appropriate error message when passed a valid but non-existent id", () => {
@@ -105,7 +87,70 @@ describe('/api/reviews/:review_id', () => {
             .get("/api/reviews/777")
             .expect(404)
             .then(({ body }) => {
-                expect(body.msg).toBe("Review 777 could not be found");
+                expect(body.msg).toBe("Not Found");
             });
     });
 });
+
+
+describe('GET /api/reviews/:review_id/comments', () => {
+    test('GET:200 responds with an array of comments for the given review_id of which each comment should have the following properties:- `comment_id`- `votes`- `created_at`- `author` which is the `username` from the users table- `body`- `review_id`comments should be served with the most recent comments first',
+        () => {
+            return request(app)
+                .get('/api/reviews/2/comments')
+                .expect(200)
+                .then((response) => {
+                    const { comments } = response.body;
+                    expect(comments.length > 0).toBe(true);
+                    comments.forEach(comment => {
+                        expect(comment).toMatchObject({
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            review_id: 2,
+                            created_at: expect.any(String),
+                            author: expect.any(String),
+                            body: expect.any(String)
+                        });
+                    });
+                    expect(comments).toBeSortedBy('created_at', {
+                        descending: true,
+                    });
+                });
+        });
+    test('GET:200 responds with an empty array when valid pass a valid id with no associated comment', () => {
+        return request(app)
+            .get('/api/reviews/7/comments')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.comments).toEqual([]);
+            });
+    });
+    test('GET:404 sends an appropriate and error message when given a valid but non-existent id', () => {
+        return request(app)
+            .get('/api/reviews/777/comments')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Review not Found');
+            });
+    });
+    test("GET:400 sends an appropriate error message when passed an invalid id", () => {
+        return request(app)
+            .get("/api/reviews/rubish_id/comments")
+            .expect(400)
+            .then((res) => {
+                expect(res.body.msg).toBe("Bad Request");
+            });
+    });
+});
+
+describe('Bad routes', () => {
+    test('GET:404 responds with a message of "Wrong URL" when provided with wrong end point', () => {
+        return request(app)
+            .get('/api/badURL')
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe('Wrong URL!');
+            });
+    });
+});
+

@@ -1,5 +1,5 @@
 const db = require('../db/connection.js');
-const reviews = require('../db/data/test-data/reviews.js');
+const { utilCheckReviewExist } =require('../utils/utils.js');
 
 exports.selectCategories = () => {
     return db.query('SELECT * FROM categories;').then(categories => {
@@ -18,10 +18,23 @@ exports.fetchReviewById = (review_id) => {
         if (!review.rows[0]) {
             return Promise.reject({
                 status: 404,
-                msg: `Review ${review_id} could not be found`,
+                msg: 'Not Found',
             }
             );
         }
         return review.rows;
     });
 };
+
+
+
+exports.fetchCommentsByReviewId = (review_id) => {
+    return utilCheckReviewExist(review_id)
+        .then(() => {
+            return db.query('SELECT * FROM comments WHERE review_id = $1 ORDER BY created_at DESC;', [review_id]);
+        })
+        .then(comments => {
+            return comments.rows;
+        });
+};
+
