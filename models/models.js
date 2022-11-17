@@ -31,7 +31,7 @@ exports.fetchReviewById = (review_id) => {
 exports.fetchCommentsByReviewId = (review_id) => {
     return utilCheckReviewExist(review_id)
         .then(() => {
-            return db.query('SELECT * FROM comments WHERE review_id = $1 ORDER BY created_at ASC;', [review_id]);
+            return db.query('SELECT * FROM comments WHERE review_id = $1 ORDER BY created_at DESC;', [review_id]);
         })
         .then(comments => {
             return comments.rows;

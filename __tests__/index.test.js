@@ -113,7 +113,7 @@ describe('GET /api/reviews/:review_id/comments', () => {
                         });
                     });
                     expect(comments).toBeSortedBy('created_at', {
-                        descending: false,
+                        descending: true,
                     });
                 });
         });
