@@ -79,7 +79,7 @@ describe('/api/reviews/:review_id', () => {
             .get("/api/reviews/sluguish")
             .expect(400)
             .then((res) => {
-                expect(res.body.msg).toBe("Invalid review identifier");
+                expect(res.body.msg).toBe("Bad Request");
             });
     });
     test("404: sends an appropriate error message when passed a valid but non-existent id", () => {
@@ -106,6 +106,7 @@ describe('GET /api/reviews/:review_id/comments', () => {
                         expect(comment).toMatchObject({
                             comment_id: expect.any(Number),
                             votes: expect.any(Number),
+                            review_id: expect.any(Number),
                             created_at: expect.any(String),
                             author: expect.any(String),
                             body: expect.any(String)
@@ -128,12 +129,28 @@ describe('GET /api/reviews/:review_id/comments', () => {
                     });
                 });
         });
-    test('GET:404 sends an appropriate and error message when given a valid but non-existent id', () => {
+    test('POST:404 sends an appropriate and error message when given a valid but non-existent id', () => {
         return request(app)
             .get('/api/reviews/777/comments')
             .expect(404)
             .then((response) => {
-                expect(response.body.msg).toBe('Not Found');
+                expect(response.body.msg).toBe('Review not Found');
+            });
+    });
+    test("POST:400 sends an appropriate error message when passed an invalid id", () => {
+        return request(app)
+            .get("/api/reviews/rubish_id/comments")
+            .expect(400)
+            .then((res) => {
+                expect(res.body.msg).toBe("Bad Request");
+            });
+    });
+    test("PST:404 sends an appropriate error message when passed a valid id with no associated comment", () => {
+        return request(app)
+            .get("/api/reviews/7/comments")
+            .expect(404)
+            .then((res) => {
+                expect(res.body.msg).toBe("Review has no comment");
             });
     });
 });
