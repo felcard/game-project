@@ -18,10 +18,23 @@ exports.fetchReviewById = (review_id) => {
         if (!review.rows[0]) {
             return Promise.reject({
                 status: 404,
-                msg: `Review ${review_id} could not be found`,
+                msg: 'Not Found',
             }
             );
         }
         return review.rows;
+    });
+};
+
+exports.fetchCommentsByReviewId = (review_id) => {
+    return db.query('SELECT * FROM comments WHERE review_id = $1 ORDER BY created_at ASC;', [review_id]).then(comments => {
+        if (!comments.rows[0]) {
+            return Promise.reject({
+                status: 404,
+                msg: 'Not Found',
+            }
+            );
+        }
+        return comments.rows;
     });
 };

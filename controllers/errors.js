@@ -1,7 +1,3 @@
-exports.wrongPaths = (req, res, next) => {
-    res.status(404).send({ msg: "Wrong URL!" });
-};
-
 exports.customErrors = (err, req, res, next) => {
     if (err.status && err.msg) {
         res.status(err.status).send({ msg: err.msg });
