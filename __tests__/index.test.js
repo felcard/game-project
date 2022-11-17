@@ -106,30 +106,26 @@ describe('GET /api/reviews/:review_id/comments', () => {
                         expect(comment).toMatchObject({
                             comment_id: expect.any(Number),
                             votes: expect.any(Number),
-                            review_id: expect.any(Number),
+                            review_id: 2,
                             created_at: expect.any(String),
                             author: expect.any(String),
                             body: expect.any(String)
                         });
                     });
-                    expect(comments[1]).toEqual(
-                        expect.objectContaining(
-                            {
-                                comment_id: 1,
-                                body: 'I loved this game too!',
-                                review_id: 2,
-                                author: 'bainesface',
-                                votes: 16,
-                                created_at: '2017-11-22T12:43:33.389Z'
-                            }
-                        )
-                    );
                     expect(comments).toBeSortedBy('created_at', {
                         descending: false,
                     });
                 });
         });
-    test('POST:404 sends an appropriate and error message when given a valid but non-existent id', () => {
+    test('GET:200 responds with an empty array when valid pass a valid id with no associated comment', () => {
+        return request(app)
+            .get('/api/reviews/7/comments')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.comments).toEqual([]);
+            });
+    });
+    test('GET:404 sends an appropriate and error message when given a valid but non-existent id', () => {
         return request(app)
             .get('/api/reviews/777/comments')
             .expect(404)
@@ -137,20 +133,12 @@ describe('GET /api/reviews/:review_id/comments', () => {
                 expect(response.body.msg).toBe('Review not Found');
             });
     });
-    test("POST:400 sends an appropriate error message when passed an invalid id", () => {
+    test("GET:400 sends an appropriate error message when passed an invalid id", () => {
         return request(app)
             .get("/api/reviews/rubish_id/comments")
             .expect(400)
             .then((res) => {
                 expect(res.body.msg).toBe("Bad Request");
-            });
-    });
-    test("PST:404 sends an appropriate error message when passed a valid id with no associated comment", () => {
-        return request(app)
-            .get("/api/reviews/7/comments")
-            .expect(404)
-            .then((res) => {
-                expect(res.body.msg).toBe("Review has no comment");
             });
     });
 });
@@ -165,3 +153,4 @@ describe('Bad routes', () => {
             });
     });
 });
+
