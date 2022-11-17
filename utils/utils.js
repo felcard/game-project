@@ -11,3 +11,16 @@ exports.utilCheckReviewExist = (review_id) => {
         }
     });
 };
+
+exports.utilCheckUsernameExist = (username) => {
+    return db.query(`SELECT username FROM users;`).then(res => {
+        const userCheck = res.rows.find(user => user.username === username);
+        if (!userCheck) {
+            return Promise.reject({
+                status: 404,
+                msg: 'Username not Found'
+            }
+            );
+        }
+    });
+};
