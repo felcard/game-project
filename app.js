@@ -1,5 +1,5 @@
 const express = require('express');
-const { getCategories, getReviews, getReviewById, getCommentsByReviewId, postCommentByReviewId, patchVotesByReviewId } = require('./controllers/controllers.js');
+const { getCategories, getReviews, getReviewById, getCommentsByReviewId, postCommentByReviewId, patchVotesByReviewId, getUsers } = require('./controllers/controllers.js');
 const { catchAll, customErrors, psqlErrors } = require('./controllers/errors');
 
 const app = express();
@@ -9,6 +9,7 @@ app.get('/api/categories', getCategories);
 app.get('/api/reviews', getReviews);
 app.get('/api/reviews/:review_id', getReviewById);
 app.get('/api/reviews/:review_id/comments', getCommentsByReviewId);
+app.get('/api/users', getUsers);
 
 app.post('/api/reviews/:review_id/comments', postCommentByReviewId);
 
