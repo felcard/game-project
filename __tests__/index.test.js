@@ -244,3 +244,82 @@ describe('POST /api/reviews/:review_id/comments', () => {
             });
     });
 });
+
+describe('PATCH : /api/reviews/:review_id', () => {
+    test('PATCH 200: updates review votes acording to passed object', () => {
+        return request(app)
+            .patch('/api/reviews/7')
+            .send({ inc_votes: 5 })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.review[0]).toMatchObject({
+                    review_id: 7,
+                    title: 'Mollit elit qui incididunt veniam occaecat cupidatat',
+                    designer: 'Avery Wunzboogerz',
+                    owner: 'mallionaire',
+                    review_img_url:
+                        'https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+                    review_body:
+                        'Consectetur incididunt aliquip sunt officia. Magna ex nulla consectetur laboris incididunt ea non qui. Enim id eiusmod irure dolor ipsum in tempor consequat amet ullamco. Occaecat fugiat sint fugiat mollit consequat pariatur consequat non exercitation dolore. Labore occaecat in magna commodo anim enim eiusmod eu pariatur ad duis magna. Voluptate ad et dolore ullamco anim sunt do. Qui exercitation tempor in in minim ullamco fugiat ipsum. Duis irure voluptate cupidatat do id mollit veniam culpa. Velit deserunt exercitation amet laborum nostrud dolore in occaecat minim amet nostrud sunt in. Veniam ut aliqua incididunt commodo sint in anim duis id commodo voluptate sit quis.',
+                    category: 'social deduction',
+                    created_at: '2021-01-25T11:16:54.963Z',
+                    votes: 14
+                });
+            });
+
+    });
+    test('PATCH: 200 responds with review and votes equal to 0 when votes number below 0', () => {
+        return request(app)
+            .patch('/api/reviews/7')
+            .send({ inc_votes: -500 })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.review.votes).toBe(0);
+            });
+    });
+    test('PATCH: 400 responds with error when object has wrong data', () => {
+        return request(app)
+            .patch('/api/reviews/7')
+            .send({ inc_votes: 'referendum' })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Bad Request');
+            });
+    });
+    test('PATCH: 400 responds with error when passed invalid review id', () => {
+        return request(app)
+            .patch('/api/reviews/garbage')
+            .send({ inc_votes: 5 })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Bad Request');
+            });
+    });
+    test('PATCH: 404 responds with error when passed valid but non existant review id', () => {
+        return request(app)
+            .patch('/api/reviews/777')
+            .send({ inc_votes: 5 })
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Review not Found');
+            });
+    });
+    test.only('PATCH: 400 responds with error when object is missing the expected property', () => {
+        return request(app)
+            .patch('/api/reviews/7')
+            .send({ rating: 5 })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Bad Request');
+            });
+    });
+    test.only('PATCH: 400 responds with error when the object property key is wrong', () => {
+        return request(app)
+            .patch('/api/reviews/7')
+            .send({ inc_vooootes: 8 })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Bad Request');
+            });
+    });
+});
