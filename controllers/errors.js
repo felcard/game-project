@@ -7,7 +7,12 @@ exports.customErrors = (err, req, res, next) => {
     }
 };
 exports.psqlErrors = (err, req, res, next) => {
-    if (err.code === '22P02') {
-        res.status(400).send({ msg: 'Bad Request' });
-    } else next(err);
+    if (["23502", "22P02", "23503"].includes(err.code)) {
+        res.status(400).send({ msg: "Bad Request" });
+    }
+    next(err);
+};
+
+exports.catchAll = (err, req, res, next) => {
+    res.status(500).send('Server Error!');
 };

@@ -1,5 +1,5 @@
 const db = require('../db/connection.js');
-const { utilCheckReviewExist } =require('../utils/utils.js');
+const { utilCheckReviewExist, utilCheckUsernameExist } = require('../utils/utils.js');
 
 exports.selectCategories = () => {
     return db.query('SELECT * FROM categories;').then(categories => {
@@ -26,8 +26,6 @@ exports.fetchReviewById = (review_id) => {
     });
 };
 
-
-
 exports.fetchCommentsByReviewId = (review_id) => {
     return utilCheckReviewExist(review_id)
         .then(() => {
@@ -38,3 +36,14 @@ exports.fetchCommentsByReviewId = (review_id) => {
         });
 };
 
+exports.insertCommentByReviewId = (review_id, { username, body }) => {
+    return utilCheckReviewExist(review_id)
+        .then(() => {
+            return utilCheckUsernameExist(username)
+                .then(() => {
+                    return db.query(`INSERT INTO comments (body,review_id,author) VALUES ($1,$2,$3) RETURNING*;`, [body, review_id, username]);
+                }).then(insertedComment => {
+                    return insertedComment.rows[0];
+                });
+        });
+};
