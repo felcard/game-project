@@ -154,8 +154,26 @@ describe('Bad routes', () => {
     });
 });
 
+describe.only('GET: /api/users', () => {
+    test('GET: 200 retrieves an array of user objects with username, name and avatar_url props', () => {
+        return request(app)
+            .get('/api/users')
+            .expect(200)
+            .then(({ body }) => {
+                const { users } = body;
+                expect(users.length > 0).toBe(true);
+                expect(users[0]).toEqual({
+                    username: 'mallionaire',
+                    name: 'haz',
+                    avatar_url:
+                        'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg'
+                });
+            });
+    });
+});
+
 describe('POST /api/reviews/:review_id/comments', () => {
-    test('GET 201: accepts request body object with username and body and responds with the posted comment', () => {
+    test('POST 201: accepts request body object with username and body and responds with the posted comment', () => {
         const newComment = {
             username: 'mallionaire',
             body: 'I enjoy playing this game every time and wit the usual suspects'
@@ -175,7 +193,7 @@ describe('POST /api/reviews/:review_id/comments', () => {
                 });
             });
     });
-    test('GET 201: accepts request body object with username and body and responds with the posted comment IGNORING additional properties', () => {
+    test('POST 201: accepts request body object with username and body and responds with the posted comment IGNORING additional properties', () => {
         const newComment = {
             username: 'mallionaire',
             body: 'I enjoy playing this game every time and wit the usual suspects',
@@ -323,3 +341,4 @@ describe('PATCH : /api/reviews/:review_id', () => {
             });
     });
 });
+

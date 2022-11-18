@@ -36,6 +36,12 @@ exports.fetchCommentsByReviewId = (review_id) => {
         });
 };
 
+exports.fetchUsers = () => {
+    return db.query('SELECT * FROM users;').then(users => {
+        return users.rows;
+    });
+};
+
 exports.insertCommentByReviewId = (review_id, { username, body }) => {
     return utilCheckReviewExist(review_id)
         .then(() => {
@@ -61,3 +67,4 @@ exports.updateVotesByReviewId = (inc_votes, review_id) => {
             return updatedVote.rows;
         });
 };
+
