@@ -1,5 +1,5 @@
 const db = require('../db/connection.js');
-const { utilCheckReviewExist, utilCheckUsernameExist } = require('../utils/utils.js');
+const { utilCheckReviewExist, utilCheckUsernameExist, utilCheckPositiveVotes } = require('../utils/utils.js');
 
 exports.selectCategories = () => {
     return db.query('SELECT * FROM categories;').then(categories => {
@@ -45,5 +45,14 @@ exports.insertCommentByReviewId = (review_id, { username, body }) => {
                 }).then(insertedComment => {
                     return insertedComment.rows[0];
                 });
+        });
+};
+
+exports.updateVotesByReviewId = (inc_votes, review_id) => {
+    return utilCheckPositiveVotes(review_id, inc_votes)
+        .then(() => {
+            return db.query('UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 AND votes + $1 >= 0 RETURNING *;', [inc_votes, review_id]);
+        }).then(updatedVote => {
+            return updatedVote.rows;
         });
 };

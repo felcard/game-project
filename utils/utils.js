@@ -24,3 +24,21 @@ exports.utilCheckUsernameExist = (username) => {
         }
     });
 };
+
+exports.utilCheckPositiveVotes = (review_id, inc_votes) => {
+    return db.query('SELECT votes FROM reviews WHERE review_id = $1;', [review_id])
+        .then(votes => {
+            if (!votes.rows.length) {
+                return Promise.reject({
+                    status: 404,
+                    msg: 'Not Found'
+                });
+            }
+            if (votes.rows[0].votes + inc_votes < 0) {
+                return Promise.reject({
+                    status: 404,
+                    msg: 'Negative Vote outcome'
+                });
+            }
+        });
+};
