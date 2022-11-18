@@ -252,7 +252,7 @@ describe('PATCH : /api/reviews/:review_id', () => {
             .send({ inc_votes: 5 })
             .expect(200)
             .then(({ body }) => {
-                expect(body.updatedReviewVote[0]).toMatchObject({
+                expect(body.review[0]).toMatchObject({
                     review_id: 7,
                     title: 'Mollit elit qui incididunt veniam occaecat cupidatat',
                     designer: 'Avery Wunzboogerz',
@@ -267,6 +267,15 @@ describe('PATCH : /api/reviews/:review_id', () => {
                 });
             });
 
+    });
+    test('PATCH: 200 responds with review and votes equal to 0 when votes number below 0', () => {
+        return request(app)
+            .patch('/api/reviews/7')
+            .send({ inc_votes: -500 })
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.review.votes).toBe(0);
+            });
     });
     test('PATCH: 400 responds with error when object has wrong data', () => {
         return request(app)
@@ -292,16 +301,25 @@ describe('PATCH : /api/reviews/:review_id', () => {
             .send({ inc_votes: 5 })
             .expect(404)
             .then(({ body }) => {
-                expect(body.msg).toBe('Not Found');
+                expect(body.msg).toBe('Review not Found');
             });
     });
-    test('PATCH: 404 responds with error inc_votes negative value turns votes into negative', () => {
+    test.only('PATCH: 400 responds with error when object is missing the expected property', () => {
         return request(app)
-            .patch('/api/reviews/5')
-            .send({ inc_votes: -500 })
-            .expect(404)
+            .patch('/api/reviews/7')
+            .send({ rating: 5 })
+            .expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe('Negative Vote outcome');
+                expect(body.msg).toBe('Bad Request');
+            });
+    });
+    test.only('PATCH: 400 responds with error when the object property key is wrong', () => {
+        return request(app)
+            .patch('/api/reviews/7')
+            .send({ inc_vooootes: 8 })
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Bad Request');
             });
     });
 });
