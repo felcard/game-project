@@ -174,7 +174,28 @@ describe('POST /api/reviews/:review_id/comments', () => {
                     created_at: expect.any(String)
                 });
             });
-
+    });
+    test('GET 201: accepts request body object with username and body and responds with the posted comment IGNORING additional properties', () => {
+        const newComment = {
+            username: 'mallionaire',
+            body: 'I enjoy playing this game every time and wit the usual suspects',
+            head: "I'm useless",
+            shoulders: 'We carry a useless thing'
+        };
+        return request(app)
+            .post('/api/reviews/2/comments')
+            .send(newComment)
+            .expect(201)
+            .then(response => {
+                expect(response.body.insertedComment).toMatchObject({
+                    comment_id: 7,
+                    body: 'I enjoy playing this game every time and wit the usual suspects',
+                    review_id: 2,
+                    author: 'mallionaire',
+                    votes: 0,
+                    created_at: expect.any(String)
+                });
+            });
     });
     test('POST: 400 responds with appropriate and error message when passed an invalid id', () => {
         return request(app)
@@ -183,16 +204,31 @@ describe('POST /api/reviews/:review_id/comments', () => {
             .then(({ body }) => {
                 expect(body.msg).toBe("Bad Request");
             });
-
+    });
+    test('POST: 400 responds with appropriate and error message when incomplete body object', () => {
+        const newComment = {
+            body: 'I enjoy playing this game every time and wit the usual suspects'
+        };
+        return request(app)
+            .post("/api/reviews/5/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad Request");
+            });
     });
     test('POST: 404 responds with appropriate and error message when passed a valid but non-existent id', () => {
+        const newComment = {
+            username: 'mallionaire',
+            body: 'I enjoy playing this game every time and wit the usual suspects'
+        };
         return request(app)
             .post('/api/reviews/777/comments')
+            .send(newComment)
             .expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe("Review not Found");
             });
-
     });
     test('POST: 404 responds with appropriate and error message when username is not found', () => {
         const newComment = {

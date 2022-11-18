@@ -27,6 +27,10 @@ exports.getCommentsByReviewId = (req, res, next) => {
 
 exports.postCommentByReviewId = (req, res, next) => {
     const { review_id } = req.params;
+    const { body, username } = req.body;
+    if (!body || !username) {
+        res.status(400).send({ msg: 'Bad Request' });
+    }
     insertCommentByReviewId(review_id, req.body).then(insertedComment => {
         res.status(201).send({ insertedComment });
     }).catch(next);
