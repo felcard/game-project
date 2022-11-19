@@ -69,7 +69,8 @@ describe('/api/reviews/:review_id', () => {
                         review_body: 'Fiddly fun for all the family',
                         category: 'dexterity',
                         created_at: '2021-01-18T10:01:41.251Z',
-                        votes: 5
+                        votes: 5,
+                        comment_count: '3'
                     })
                 );
             });
@@ -154,7 +155,7 @@ describe('Bad routes', () => {
     });
 });
 
-describe.only('GET: /api/users', () => {
+describe('GET: /api/users', () => {
     test('GET: 200 retrieves an array of user objects with username, name and avatar_url props', () => {
         return request(app)
             .get('/api/users')
@@ -322,7 +323,7 @@ describe('PATCH : /api/reviews/:review_id', () => {
                 expect(body.msg).toBe('Review not Found');
             });
     });
-    test.only('PATCH: 400 responds with error when object is missing the expected property', () => {
+    test('PATCH: 400 responds with error when object is missing the expected property', () => {
         return request(app)
             .patch('/api/reviews/7')
             .send({ rating: 5 })
@@ -331,7 +332,7 @@ describe('PATCH : /api/reviews/:review_id', () => {
                 expect(body.msg).toBe('Bad Request');
             });
     });
-    test.only('PATCH: 400 responds with error when the object property key is wrong', () => {
+    test('PATCH: 400 responds with error when the object property key is wrong', () => {
         return request(app)
             .patch('/api/reviews/7')
             .send({ inc_vooootes: 8 })

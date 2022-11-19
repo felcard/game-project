@@ -14,7 +14,7 @@ exports.selectReviews = () => {
 };
 
 exports.fetchReviewById = (review_id) => {
-    return db.query('SELECT * FROM reviews WHERE review_id = $1;', [review_id]).then(review => {
+    return db.query('SELECT reviews.owner,reviews.title,reviews.review_body,reviews.category,reviews.review_img_url,reviews.created_at,reviews.votes,reviews.designer, COUNT(comments.review_id) AS comment_count FROM reviews INNER JOIN comments ON comments.review_id = reviews.review_id WHERE reviews.review_id = $1 GROUP BY reviews.review_id;', [review_id]).then(review => {
         if (!review.rows[0]) {
             return Promise.reject({
                 status: 404,
