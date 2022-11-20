@@ -1,4 +1,4 @@
-const { selectCategories, selectReviews, fetchReviewById, fetchCommentsByReviewId, insertCommentByReviewId, updateVotesByReviewId, fetchUsers } = require('../models/models.js');
+const { selectCategories, selectReviews, fetchReviewById, fetchCommentsByReviewId, insertCommentByReviewId, updateVotesByReviewId, fetchUsers, removeComment } = require('../models/models.js');
 
 exports.getCategories = (req, res, next) => {
     selectCategories().then(categories => {
@@ -50,3 +50,11 @@ exports.patchVotesByReviewId = (req, res, next) => {
     }).catch(next);
 };
 
+exports.deleteComment = (req, res, next) => {
+    removeComment(req.params.comment_id).then(deletedComment => {
+        if (!deletedComment.length) {
+            res.status(404).send({ msg: 'Comment does not exist' });
+        }
+        res.status(204).send();
+    }).catch(next);
+};
