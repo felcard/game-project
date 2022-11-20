@@ -1,5 +1,5 @@
 const express = require('express');
-const { getCategories, getReviews, getReviewById, getCommentsByReviewId, postCommentByReviewId, patchVotesByReviewId, getUsers } = require('./controllers/controllers.js');
+const { getCategories, getReviews, getReviewById, getCommentsByReviewId, postCommentByReviewId, patchVotesByReviewId, getUsers, deleteComment } = require('./controllers/controllers.js');
 const { catchAll, customErrors, psqlErrors } = require('./controllers/errors');
 
 const app = express();
@@ -14,6 +14,9 @@ app.get('/api/users', getUsers);
 app.post('/api/reviews/:review_id/comments', postCommentByReviewId);
 
 app.patch('/api/reviews/:review_id', patchVotesByReviewId);
+
+app.delete('/api/comments/:comment_id', deleteComment);
+
 
 app.use(psqlErrors);
 app.use(customErrors);

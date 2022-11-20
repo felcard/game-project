@@ -64,19 +64,19 @@ describe('/api/reviews', () => {
     });
     test('GET:400 sends error message when sorting query is invalid', () => {
         return request(app)
-        .get('/api/reviews?sort_by=all')
-        .expect(400)
-        .then(res => {
-            expect(res.body.msg).toBe('Invalid sort query');
-        });
+            .get('/api/reviews?sort_by=all')
+            .expect(400)
+            .then(res => {
+                expect(res.body.msg).toBe('Invalid sort query');
+            });
     });
     test('GET:400 sends error message when order query is invalid', () => {
         return request(app)
-        .get('/api/reviews?order=neworder')
-        .expect(400)
-        .then(res => {
-            expect(res.body.msg).toBe('Invalid order query');
-        });
+            .get('/api/reviews?order=neworder')
+            .expect(400)
+            .then(res => {
+                expect(res.body.msg).toBe('Invalid order query');
+            });
     });
     test('', () => {
 
@@ -372,4 +372,27 @@ describe('PATCH : /api/reviews/:review_id', () => {
             });
     });
 });
+describe('DELETE /api/comments/:comment_id', () => {
+    test('DELETE: 204 delete coment by id responds with status 204 and no content', () => {
+        return request(app)
+            .delete('/api/comments/3')
+            .expect(204);
+    });
+    test("400: sends an appropriate error message when given an invalid id", () => {
+        return request(app)
+            .delete("/api/comments/notanumber")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad Request");
+            });
+    });
+    test("400: sends an appropriate error message when given a valid but nonexistent id", () => {
+        return request(app)
+            .delete("/api/comments/100")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Comment does not exist");
+            });
+    });
 
+})
