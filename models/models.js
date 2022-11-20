@@ -7,8 +7,39 @@ exports.selectCategories = () => {
     });
 };
 
-exports.selectReviews = () => {
-    return db.query('SELECT reviews.owner,reviews.title,reviews.review_id,reviews.category,reviews.review_img_url,reviews.created_at,reviews.votes,reviews.designer, COUNT(comments.review_id) AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id GROUP BY reviews.review_id ORDER BY reviews.created_at DESC;').then(reviews => {
+exports.selectReviews = (query) => {
+    const { category, sort_by, order } = query;
+    let queryStr = 'SELECT * FROM reviews ';
+    if (category) {
+        queryStr += 'WHERE category = $1 ';
+    }
+    if (sort_by) {
+        if (['review_id', 'title', 'designer', 'owner', 'review_img_url', 'review_body', 'category', 'created_at', 'votes'].includes(sort_by)) {
+            queryStr += `ORDER BY ${sort_by}`;
+        } else {
+            return Promise.reject({ status: 400, msg: 'Invalid sort query' });
+        }
+    } else {
+        queryStr += `ORDER BY created_at`;
+    }
+    if (order) {
+        if (['ASC', 'DESC'].includes(order)) {
+            queryStr += ` ${order}`;
+        }
+        else {
+            return Promise.reject({ status: 400, msg: 'Invalid order query' });
+        }
+    } else {
+        queryStr += ' DESC;';
+    }
+    return db.query(queryStr, [category ? category : '']).then(reviews => {
+        if (!reviews.rows.length) {
+            return Promise.reject({
+                status: 404,
+                msg: 'Not Found',
+            }
+            );
+        }
         return reviews.rows;
     });
 };

@@ -3,6 +3,8 @@ const request = require('supertest');
 const db = require('../db/connection.js');
 const seed = require('../db/seeds/seed.js');
 const seedingData = require('../db/data/test-data/index.js');
+const { forEach } = require('../db/data/test-data/categories.js');
+const { get } = require('../app.js');
 
 beforeEach(() => seed(seedingData));
 afterAll(() => db.end());
@@ -28,28 +30,56 @@ describe('api/categories', () => {
 });
 
 describe('/api/reviews', () => {
-    test('GET:200 responds with array of reviews with properties: owner(which is the `username` from the users table), title, review_id, category, review_img_url, created_at, votes, designer, comment_count which is the total count of all the comments with this review_id. the reviews should be sorted by date in descending order', () => {
+    test('GET: 200 responds with reviews optionally by category, sort_by which defaults to date , and order which defaults to descending', () => {
         return request(app)
-            .get('/api/reviews')
+            .get('/api/reviews?category=social deduction&sort_by=review_id&order=DESC')
             .expect(200)
-            .then(response => {
-                const reviews = response.body.reviews;
-                expect(reviews.length === 13).toBe(true);
-                expect(reviews[0]).toEqual(expect.objectContaining({
-                    owner: 'mallionaire',
-                    title: 'Mollit elit qui incididunt veniam occaecat cupidatat',
-                    review_id: 7,
-                    category: 'social deduction',
-                    review_img_url: 'https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-                    created_at: '2021-01-25T11:16:54.963Z',
-                    votes: 9,
-                    designer: 'Avery Wunzboogerz',
-                    comment_count: '0'
-                }));
-                expect(reviews).toBeSortedBy('created_at', {
+            .then(({ body }) => {
+                expect(body.reviews.length).toBe(11);
+                body.reviews.forEach(review => {
+                    expect(review).toMatchObject({
+                        review_id: expect.any(Number),
+                        title: expect.any(String),
+                        designer: expect.any(String),
+                        owner: expect.any(String),
+                        review_img_url: expect.any(String),
+                        review_body: expect.any(String),
+                        category: 'social deduction',
+                        created_at: expect.any(String),
+                        votes: expect.any(Number)
+                    });
+                });
+                expect(body.reviews).toBeSortedBy('review_id', {
                     descending: true,
                 });
             });
+    });
+    test('GET:404 sends error message when category not found', () => {
+        return request(app)
+            .get('/api/reviews?category=strategy')
+            .expect(404)
+            .then(res => {
+                expect(res.body.msg).toBe('Not Found');
+            });
+    });
+    test('GET:400 sends error message when sorting query is invalid', () => {
+        return request(app)
+        .get('/api/reviews?sort_by=all')
+        .expect(400)
+        .then(res => {
+            expect(res.body.msg).toBe('Invalid sort query');
+        });
+    });
+    test('GET:400 sends error message when order query is invalid', () => {
+        return request(app)
+        .get('/api/reviews?order=neworder')
+        .expect(400)
+        .then(res => {
+            expect(res.body.msg).toBe('Invalid order query');
+        });
+    });
+    test('', () => {
+
     });
 });
 
