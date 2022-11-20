@@ -28,26 +28,22 @@ describe('api/categories', () => {
 });
 
 describe('/api/reviews', () => {
-    test('GET:200 responds with array of reviews with properties: owner(which is the `username` from the users table), title, review_id, category, review_img_url, created_at, votes, designer, comment_count which is the total count of all the comments with this review_id. the reviews should be sorted by date in descending order', () => {
+    test('GET: 200 responds with reviews with optional category, sort_by, and order queries', () => {
         return request(app)
-            .get('/api/reviews')
+            .get('/api/reviews?category=dexterity&order=DESC')
             .expect(200)
-            .then(response => {
-                const reviews = response.body.reviews;
-                expect(reviews.length === 13).toBe(true);
-                expect(reviews[0]).toEqual(expect.objectContaining({
-                    owner: 'mallionaire',
-                    title: 'Mollit elit qui incididunt veniam occaecat cupidatat',
-                    review_id: 7,
-                    category: 'social deduction',
-                    review_img_url: 'https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-                    created_at: '2021-01-25T11:16:54.963Z',
-                    votes: 9,
-                    designer: 'Avery Wunzboogerz',
-                    comment_count: '0'
-                }));
-                expect(reviews).toBeSortedBy('created_at', {
-                    descending: true,
+            .then(({ body }) => {
+                expect(body.reviews[0]).toEqual({
+                    review_id: 2,
+                    title: 'Jenga',
+                    designer: 'Leslie Scott',
+                    owner: 'philippaclaire9',
+                    review_img_url:
+                        'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+                    review_body: 'Fiddly fun for all the family',
+                    category: 'dexterity',
+                    created_at: '2021-01-18T10:01:41.251Z',
+                    votes: 5
                 });
             });
     });
