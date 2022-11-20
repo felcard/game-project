@@ -3,6 +3,8 @@ const request = require('supertest');
 const db = require('../db/connection.js');
 const seed = require('../db/seeds/seed.js');
 const seedingData = require('../db/data/test-data/index.js');
+const { forEach } = require('../db/data/test-data/categories.js');
+const { get } = require('../app.js');
 
 beforeEach(() => seed(seedingData));
 afterAll(() => db.end());
@@ -28,24 +30,56 @@ describe('api/categories', () => {
 });
 
 describe('/api/reviews', () => {
-    test('GET: 200 responds with reviews with optional category, sort_by, and order queries', () => {
+    test('GET: 200 responds with reviews optionally by category, sort_by which defaults to date , and order which defaults to descending', () => {
         return request(app)
-            .get('/api/reviews?category=dexterity&order=DESC')
+            .get('/api/reviews?category=social deduction&sort_by=review_id&order=DESC')
             .expect(200)
             .then(({ body }) => {
-                expect(body.reviews[0]).toEqual({
-                    review_id: 2,
-                    title: 'Jenga',
-                    designer: 'Leslie Scott',
-                    owner: 'philippaclaire9',
-                    review_img_url:
-                        'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
-                    review_body: 'Fiddly fun for all the family',
-                    category: 'dexterity',
-                    created_at: '2021-01-18T10:01:41.251Z',
-                    votes: 5
+                expect(body.reviews.length).toBe(11);
+                body.reviews.forEach(review => {
+                    expect(review).toMatchObject({
+                        review_id: expect.any(Number),
+                        title: expect.any(String),
+                        designer: expect.any(String),
+                        owner: expect.any(String),
+                        review_img_url: expect.any(String),
+                        review_body: expect.any(String),
+                        category: 'social deduction',
+                        created_at: expect.any(String),
+                        votes: expect.any(Number)
+                    });
+                });
+                expect(body.reviews).toBeSortedBy('review_id', {
+                    descending: true,
                 });
             });
+    });
+    test('GET:404 sends error message when category not found', () => {
+        return request(app)
+            .get('/api/reviews?category=strategy')
+            .expect(404)
+            .then(res => {
+                expect(res.body.msg).toBe('Not Found');
+            });
+    });
+    test('GET:400 sends error message when sorting query is invalid', () => {
+        return request(app)
+        .get('/api/reviews?sort_by=all')
+        .expect(400)
+        .then(res => {
+            expect(res.body.msg).toBe('Invalid sort query');
+        });
+    });
+    test('GET:400 sends error message when order query is invalid', () => {
+        return request(app)
+        .get('/api/reviews?order=neworder')
+        .expect(400)
+        .then(res => {
+            expect(res.body.msg).toBe('Invalid order query');
+        });
+    });
+    test('', () => {
+
     });
 });
 

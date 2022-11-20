@@ -9,16 +9,37 @@ exports.selectCategories = () => {
 
 exports.selectReviews = (query) => {
     const { category, sort_by, order } = query;
-    const queryValues = [];
     let queryStr = 'SELECT * FROM reviews ';
     if (category) {
-        queryValues.push(category);
         queryStr += 'WHERE category = $1 ';
     }
-    if (sort_by) queryValues.push(sort_by);
-    queryStr += `ORDER BY ${sort_by ? '$2' : 'created_at'}`;
-    queryStr += order === 'ASC' ? ' ASC;' : ' DESC;';
-    return db.query(queryStr, queryValues).then(reviews => {
+    if (sort_by) {
+        if (['review_id', 'title', 'designer', 'owner', 'review_img_url', 'review_body', 'category', 'created_at', 'votes'].includes(sort_by)) {
+            queryStr += `ORDER BY ${sort_by}`;
+        } else {
+            return Promise.reject({ status: 400, msg: 'Invalid sort query' });
+        }
+    } else {
+        queryStr += `ORDER BY created_at`;
+    }
+    if (order) {
+        if (['ASC', 'DESC'].includes(order)) {
+            queryStr += ` ${order}`;
+        }
+        else {
+            return Promise.reject({ status: 400, msg: 'Invalid order query' });
+        }
+    } else {
+        queryStr += ' DESC;';
+    }
+    return db.query(queryStr, [category ? category : '']).then(reviews => {
+        if (!reviews.rows.length) {
+            return Promise.reject({
+                status: 404,
+                msg: 'Not Found',
+            }
+            );
+        }
         return reviews.rows;
     });
 };
