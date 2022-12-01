@@ -30,5 +30,75 @@
         }
       ]
     }
+  },
+  "GET /api/reviews/:reviews_id": {
+    "description": "responds with a review object",
+    "params": "review_id",
+    "exampleResponse": {
+      "title": "Jenga",
+      "designer": "Leslie Scott",
+      "owner": "philippaclaire9",
+      "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+      "review_body": "Fiddly fun for all the family",
+      "category": "dexterity",
+      "created_at": "2021-01-18T10:01:41.251Z",
+      "votes": 5,
+      "comment_count": "3"
+    }
+  },
+  "GET /api/reviews/:review_id/comments": {
+    "description": "responds with array of comments ordered by date",
+    "params": "review_id",
+    "exampleResponse": [
+      {
+        "body": "My dog loved this game too!",
+        "votes": 13,
+        "author": "mallionaire",
+        "review_id": 3,
+        "created_at": "2021-01-18 10:09:05.41"
+      }
+    ]
+  },
+  "POST /api/reviews/:review_id/comments": {
+    "description": "accepts a comment object and responds with posted comment object",
+    "requestBody": {
+      "username": "mallionaire",
+      "body": "I enjoy playing this game every time and wit the usual suspects"
+    },
+    "exampleResponse": {
+      "comment_id": 7,
+      "body": "I enjoy playing this game every time and wit the usual suspects",
+      "review_id": 2,
+      "author": "mallionaire",
+      "votes": 0,
+      "created_at": "2021-01-18 10:09:05.41"
+    }
+  },
+  "PATCH : /api/reviews/:review_id": {
+    "description": "updates review votes acording to passed object",
+    "requestBody": { "inc_votes": 5 },
+    "exampleResponse": {
+      "title": "One Night Ultimate Werewolf",
+      "designer": "Akihisa Okui",
+      "owner": "happyamy2016",
+      "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+      "category": "hidden-roles",
+      "created_at": 1610964101251,
+      "votes": 10
+    }
+  },
+  "GET: /api/users": {
+    "description": "responds with an array of users",
+    "exampleResponse": [
+      {
+        "username": "dav3rid",
+        "name": "dave",
+        "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+      }
+    ]
+  },
+  "DELETE: /api/comments/:comment_id": {
+    "description": "delete coment by id responds with no content",
+    "exampleResponse": "Status 204"
   }
 }
