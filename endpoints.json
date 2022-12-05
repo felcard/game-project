@@ -31,7 +31,7 @@
       ]
     }
   },
-  "GET /api/reviews/:reviews_id": {
+  "GET /api/reviews/:review_id": {
     "description": "responds with a review object",
     "params": "review_id",
     "exampleResponse": {
