@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const {
   getCategories,
   getReviews,
@@ -13,6 +14,7 @@ const {
 const { catchAll, customErrors, psqlErrors } = require("./controllers/errors");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.get("/api", getApi);
