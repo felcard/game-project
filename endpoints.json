@@ -53,6 +53,7 @@
     "params": "review_id",
     "exampleResponse": [
       {
+        "comment_id": 2,
         "body": "My dog loved this game too!",
         "votes": 13,
         "author": "mallionaire",
